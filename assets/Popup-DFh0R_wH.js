@@ -1,0 +1,1 @@
+import{a as o,m as n,_ as t,r,c as s,o as c}from"./index-DBEWf236.js";import{S as a}from"./Screen-B3U2ehxk.js";const p=o({name:"PopupClockPage",components:{Screen:a},computed:{module_id(){return n.id},module(){return this.$modules.get(this.module_id)}}});function m(d,u,_,i,f,l){const e=r("Screen");return c(),s(e)}const h=t(p,[["render",m]]);export{h as default};
