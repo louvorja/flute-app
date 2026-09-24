@@ -1,0 +1,1 @@
+import{a as o,p as n,_ as t,r,c as s,o as c}from"./index-BmiGaacE.js";import{S as p}from"./Screen-D63ojcVq.js";const a=o({name:"PopupTimerPage",components:{Screen:p},computed:{module_id(){return n.id},module(){return this.$modules.get(this.module_id)}}});function m(d,i,u,_,f,l){const e=r("Screen");return c(),s(e)}const h=t(a,[["render",m]]);export{h as default};
