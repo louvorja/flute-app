@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Controle Remoto - Louvor JA</title>
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#141722">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/favicon-180x180.png">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-height: 100dvh;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #0d0f15;
+      color: #e0e0e0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      height: 100vh;
+      height: 100dvh;
+      max-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      user-select: none;
+      position: relative;
+    }
+
+    header {
+      padding: clamp(8px, 1.5vh, 12px) 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #141722;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .brand h2 {
+      font-size: 11px;
+      font-weight: 600;
+      color: #0097d7;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ffb300;
+      box-shadow: 0 0 10px rgba(255, 179, 0, 0.7);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .dot.connected {
+      background: #4caf50;
+      box-shadow: 0 0 10px rgba(76, 175, 80, 0.8);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-fullscreen {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #cfd8dc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, color 0.2s ease;
+      outline: none;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-fullscreen:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    .btn-fullscreen:active {
+      transform: scale(0.92);
+      background: rgba(0, 151, 215, 0.25);
+      border-color: #0097d7;
+      color: #0097d7;
+    }
+
+    .btn-fullscreen.active {
+      background: rgba(0, 151, 215, 0.2);
+      border-color: rgba(0, 151, 215, 0.5);
+      color: #0097d7;
+    }
+
+    .btn-fullscreen svg {
+      fill: currentColor;
+    }
+
+    /* BANNER INTERATIVO DE TELA CHEIA */
+    .banner-fullscreen {
+      display: none;
+      background: linear-gradient(135deg, rgba(0, 151, 215, 0.22), rgba(0, 151, 215, 0.08));
+      border: 1px solid rgba(0, 151, 215, 0.35);
+      color: #4fc3f7;
+      padding: clamp(6px, 1.1vh, 9px) 14px;
+      margin: clamp(6px, 1.1vh, 8px) 14px 0 14px;
+      border-radius: 10px;
+      font-size: clamp(11px, 1.5vh, 12px);
+      font-weight: 600;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+      animation: pulseBanner 2.2s infinite ease-in-out;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    @keyframes pulseBanner {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.015); box-shadow: 0 0 14px rgba(0, 151, 215, 0.35); }
+    }
+
+    .banner-fullscreen:active {
+      transform: scale(0.98);
+      background: rgba(0, 151, 215, 0.35);
+    }
+
+    .banner-fullscreen svg {
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .dot.disconnected {
+      background: #f44336;
+      box-shadow: 0 0 10px rgba(244, 67, 54, 0.8);
+    }
+
+    /* CARD DINÂMICO DE MÍDIA ATIVA (APARECE APENAS QUANDO HÁ MÍDIA / BÍBLIA) */
+    .dynamic-media-card {
+      display: none;
+      margin: clamp(6px, 1.2vh, 10px) 16px 0 16px;
+      padding: clamp(8px, 1.2vh, 12px) 16px;
+      background: rgba(23, 27, 38, 0.88);
+      border-radius: 14px;
+      border: 1px solid rgba(0, 151, 215, 0.25);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      animation: slideDownFade 0.25s ease-out;
+      flex-shrink: 0;
+    }
+
+    @keyframes slideDownFade {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dynamic-media-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dynamic-media-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .dynamic-media-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+      border: 1px solid rgba(76, 175, 80, 0.4);
+    }
+
+    .dynamic-media-badge.paused {
+      background: rgba(255, 179, 0, 0.2);
+      color: #ffb74d;
+      border: 1px solid rgba(255, 179, 0, 0.4);
+    }
+
+    /* BOTÕES PRINCIPAIS */
+    main {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(10px, 2.5vh, 22px);
+      padding: clamp(6px, 1.5vh, 14px) 16px;
+      overflow: hidden;
+    }
+
+    .top-actions {
+      display: flex;
+      width: 100%;
+      max-width: 310px;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      background: #1b1f2c;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease, background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      outline: none;
+    }
+
+    .btn:active {
+      transform: scale(0.92);
+      background: #252b3d;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-action {
+      flex: 1;
+      height: clamp(40px, 5.5vh, 48px);
+      border-radius: 14px;
+      gap: 8px;
+      font-size: clamp(13px, 1.8vh, 15px);
+    }
+
+    .btn-close {
+      background: rgba(244, 67, 54, 0.12);
+      border-color: rgba(244, 67, 54, 0.3);
+      color: #ef5350;
+    }
+
+    .btn-close:active {
+      background: rgba(244, 67, 54, 0.25);
+    }
+
+    .btn-search {
+      background: rgba(0, 151, 215, 0.12);
+      border-color: rgba(0, 151, 215, 0.3);
+      color: #29b6f6;
+    }
+
+    .btn-search:active {
+      background: rgba(0, 151, 215, 0.25);
+    }
+
+    /* CONTROLE CRUCIFORME RESPONSIVO */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(3, clamp(66px, 19vw, 84px));
+      grid-template-rows: repeat(3, clamp(66px, 9.8vh, 84px));
+      gap: clamp(8px, 1.8vh, 14px);
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-arrow {
+      width: 100%;
+      height: 100%;
+      border-radius: clamp(16px, 2.4vh, 22px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+
+    .btn-arrow span {
+      font-size: clamp(9px, 1.2vh, 10px);
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.6);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-vol {
+      background: #171b26;
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-vol:active {
+      background: #23293a;
+    }
+
+    .btn-center {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0097d7 0%, #1565c0 100%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 8px 20px rgba(0, 151, 215, 0.4);
+    }
+
+    .btn-center:active {
+      background: linear-gradient(135deg, #0084c1 0%, #0d47a1 100%);
+      transform: scale(0.92);
+    }
+
+    .btn.disabled,
+    .btn[disabled] {
+      opacity: 0.35 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      filter: grayscale(0.85) !important;
+      box-shadow: none !important;
+    }
+
+    svg {
+      width: clamp(22px, 3vh, 28px);
+      height: clamp(22px, 3vh, 28px);
+      fill: currentColor;
+    }
+
+    /* TOAST DE FEEDBACK FLUTUANTE */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(20, 24, 34, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* MODAL DE PESQUISA MODERNO */
+    .search-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(10, 12, 18, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.98); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .search-header {
+      padding: 14px 16px;
+      background: #141722;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon-left,
+    .search-input-wrapper > svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: #78909c;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .search-input {
+      width: 100%;
+      min-width: 0;
+      height: 44px;
+      background: #1c202d;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 0 40px 0 42px;
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: #0097d7;
+      box-shadow: 0 0 0 2px rgba(0, 151, 215, 0.25);
+    }
+
+    .search-clear-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border: none;
+      color: #cfd8dc;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 3;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .search-clear-btn:active {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+
+    .search-clear-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .search-close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 0 16px;
+      height: 44px;
+      border-radius: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .search-results {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .search-item {
+      background: #161924;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    .search-item-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      cursor: pointer;
+    }
+
+    .search-item-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hymn-badge {
+      background: rgba(0, 151, 215, 0.18);
+      color: #29b6f6;
+      border: 1px solid rgba(0, 151, 215, 0.35);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .search-item-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search-item-artist {
+      font-size: 12px;
+      color: #90a4ae;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 8px;
+    }
+
+    .song-action-btn {
+      flex: 1;
+      min-width: 0;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #1c202e;
+      color: #cfd8dc;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease, color 0.15s ease;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+      padding: 0 4px;
+      white-space: nowrap;
+    }
+
+    .song-action-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .song-action-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    .song-action-btn.btn-audio {
+      background: rgba(0, 151, 215, 0.15);
+      border-color: rgba(0, 151, 215, 0.35);
+      color: #4fc3f7;
+    }
+
+    .song-action-btn.btn-audio:active {
+      background: rgba(0, 151, 215, 0.3);
+    }
+
+    .song-action-btn.btn-pb {
+      background: rgba(103, 58, 183, 0.16);
+      border-color: rgba(149, 117, 205, 0.35);
+      color: #b39ddb;
+    }
+
+    .song-action-btn.btn-pb:active:not(:disabled) {
+      background: rgba(103, 58, 183, 0.35);
+    }
+
+    .song-action-btn.btn-no-audio {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #b0bec5;
+    }
+
+    .song-action-btn.btn-no-audio:active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .song-action-btn.disabled,
+    .song-action-btn:disabled {
+      opacity: 0.28 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+      border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .search-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: rgba(255, 255, 255, 0.35);
+      gap: 14px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .search-empty svg {
+      width: 44px;
+      height: 44px;
+      fill: rgba(255, 255, 255, 0.18);
+    }
+
+    /* MODAL DE CONFIRMAÇÃO E MODAL DE TOKEN */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.82);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 2000;
+      animation: fadeIn 0.18s ease-out;
+    }
+
+    .modal-card {
+      background: #1c202d;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 26px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-card h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .btn-modal-action {
+      flex: 1;
+      height: 46px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+
+    .btn-modal-action:active {
+      transform: scale(0.96);
+    }
+
+    .btn-cancel {
+      background: rgba(255, 255, 255, 0.08);
+      color: #cfd8dc;
+    }
+
+    .btn-cancel:active {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .btn-danger {
+      background: #d32f2f;
+      color: #ffffff;
+    }
+
+    .btn-danger:active {
+      background: #c62828;
+    }
+
+    .token-input {
+      width: 100%;
+      height: 52px;
+      background: #12141c;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-align: center;
+      margin-bottom: 18px;
+      outline: none;
+    }
+
+    .token-input:focus {
+      border-color: #0097d7;
+      box-shadow: 0 0 0 3px rgba(0, 151, 215, 0.25);
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 48px;
+      background: #0097d7;
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="width: 56px;"></div>
+    <div class="brand">
+      <h1>LOUVOR JA</h1>
+      <h2>Controle Remoto</h2>
+    </div>
+    <div class="header-right">
+      <button id="btn-fullscreen" class="btn-fullscreen" title="Alternar Tela Cheia" onclick="Remote.toggleFullscreen()">
+        <svg id="icon-fs-enter" viewBox="0 0 24 24" width="20" height="20">
+          <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+        </svg>
+        <svg id="icon-fs-exit" viewBox="0 0 24 24" width="20" height="20" style="display: none;">
+          <path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>
+        </svg>
+      </button>
+      <div id="dot" class="dot" title="Status da Conexão"></div>
+    </div>
+  </header>
+
+  <!-- BANNER DE TELA CHEIA -->
+  <div id="banner-fullscreen" class="banner-fullscreen" onclick="Remote.toggleFullscreen()">
+    <svg viewBox="0 0 24 24" width="18" height="18"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+    <span>Toque aqui para ativar Tela Cheia</span>
+  </div>
+
+  <!-- CARD DINÂMICO DE MÍDIA ATIVA (APARECE APENAS QUANDO HOUVER PROJEÇÃO) -->
+  <div id="media-card" class="dynamic-media-card" style="display: none;">
+    <div class="dynamic-media-header">
+      <span id="media-badge" class="dynamic-media-badge">Reproduzindo</span>
+      <span id="media-title" class="dynamic-media-title"></span>
+    </div>
+  </div>
+
+  <!-- CONTROLES -->
+  <main>
+    <div class="top-actions">
+      <button id="btn-close" class="btn btn-action btn-close disabled" disabled onclick="Remote.requestClose()">
+        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        <span>Fechar</span>
+      </button>
+      <button class="btn btn-action btn-search" onclick="Remote.openSearch()">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <span>Buscar</span>
+      </button>
+    </div>
+
+    <div class="controls-grid">
+      <!-- LINHA 1: VOLUME AUMENTAR -->
+      <div></div>
+      <button class="btn btn-arrow btn-vol" onclick="Remote.volumeUp()" title="Aumentar Volume">
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        <span>Vol +</span>
+      </button>
+      <div></div>
+
+      <!-- LINHA 2: SLIDE ANTERIOR | PLAY-PAUSE | SLIDE PRÓXIMO -->
+      <button id="btn-prev" class="btn btn-arrow disabled" disabled onclick="Remote.sendSlide('previous')" title="Slide Anterior">
+        <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+        <span>Anterior</span>
+      </button>
+
+      <button id="btn-play-pause" class="btn btn-center disabled" disabled onclick="Remote.playPause()" title="Play / Pause">
+        <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="icon-pause" viewBox="0 0 24 24" style="display: none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+
+      <button id="btn-next" class="btn btn-arrow disabled" disabled onclick="Remote.sendSlide('next')" title="Próximo Slide">
+        <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+        <span>Próximo</span>
+      </button>
+
+      <!-- LINHA 3: VOLUME DIMINUIR -->
+      <div></div>
+      <button class="btn btn-arrow btn-vol" onclick="Remote.volumeDown()" title="Diminuir Volume">
+        <svg viewBox="0 0 24 24"><path d="M7 9v6h4l5 5V4L11 9H7zm11.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        <span>Vol -</span>
+      </button>
+      <div></div>
+    </div>
+  </main>
+
+  <!-- TOAST FLUTUANTE DE FEEDBACK -->
+  <div id="toast" class="toast"></div>
+
+  <!-- MODAL DE CONFIRMAÇÃO DE FECHAMENTO -->
+  <div id="modal-confirm-close" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(244, 67, 54, 0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto; color: #ef5350;">
+        <svg viewBox="0 0 24 24" style="width: 28px; height: 28px;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </div>
+      <h3>Encerrar Apresentação?</h3>
+      <p style="font-size: 13px; color: #90a4ae; margin-bottom: 22px;">Deseja realmente fechar a música/projeção atual?</p>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-modal-action btn-cancel" onclick="Remote.cancelClose()">Cancelar</button>
+        <button class="btn-modal-action btn-danger" onclick="Remote.confirmClose()">Sim, Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE BUSCA DE MÚSICAS -->
+  <div id="search-modal" class="search-overlay" style="display: none;">
+    <div class="search-header">
+      <div class="search-input-wrapper">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input 
+          type="text" 
+          id="search-input" 
+          class="search-input" 
+          placeholder="Nome da música, hino ou trecho..." 
+          autocomplete="off" 
+        />
+        <button id="search-clear" class="search-clear-btn" style="display: none;" onclick="Remote.clearSearch()">
+          <svg viewBox="0 0 24 24" style="width: 18px; height: 18px;"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <button class="search-close-btn" onclick="Remote.closeSearch()">Fechar</button>
+    </div>
+
+    <div id="search-results" class="search-results">
+      <div class="search-empty">
+        <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        <span>Digite o nome da música, número do hino ou trecho da letra para buscar.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE TOKEN -->
+  <div id="modal-token" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <h3>Digite o Token de Acesso</h3>
+      <p style="font-size: 13px; color: #90a4ae; margin-bottom: 16px;">Consulte o token na tela de Transmissão do Louvor JA.</p>
+      <input type="text" id="token-input" class="token-input" maxlength="10" placeholder="TOKEN" autocomplete="off" />
+      <button class="btn-submit" onclick="Remote.saveToken()">Conectar</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const dotEl = document.getElementById("dot");
+      const mediaCardEl = document.getElementById("media-card");
+      const mediaTitleEl = document.getElementById("media-title");
+      const mediaBadgeEl = document.getElementById("media-badge");
+      const toastEl = document.getElementById("toast");
+      const modalTokenEl = document.getElementById("modal-token");
+      const modalConfirmCloseEl = document.getElementById("modal-confirm-close");
+      const tokenInputEl = document.getElementById("token-input");
+
+      const iconPlay = document.getElementById("icon-play");
+      const iconPause = document.getElementById("icon-pause");
+
+      // Modal de Busca
+      const searchModal = document.getElementById("search-modal");
+      const searchInput = document.getElementById("search-input");
+      const searchClear = document.getElementById("search-clear");
+      const searchResults = document.getElementById("search-results");
+
+      let currentVolume = 100;
+      let isPlaying = false;
+      let hasMedia = false;
+      let toastTimer = null;
+      let searchDebounceTimer = null;
+      let isTogglingPlay = false;
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+          toastEl.classList.remove("show");
+        }, 1800);
+      }
+
+      function getToken() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("token") || localStorage.getItem("louvorja_token") || "";
+      }
+
+      function setToken(token) {
+        localStorage.setItem("louvorja_token", token);
+      }
+
+      function updateStatus(connected) {
+        dotEl.className = "dot " + (connected ? "connected" : "disconnected");
+      }
+
+      function updatePlayState(paused) {
+        isPlaying = !paused;
+        if (isPlaying) {
+          iconPlay.style.display = "none";
+          iconPause.style.display = "block";
+          if (mediaBadgeEl) {
+            mediaBadgeEl.textContent = "Reproduzindo";
+            mediaBadgeEl.className = "dynamic-media-badge";
+            mediaBadgeEl.style.display = "inline-block";
+          }
+        } else {
+          iconPlay.style.display = "block";
+          iconPause.style.display = "none";
+          if (mediaBadgeEl) {
+            mediaBadgeEl.textContent = "Pausado";
+            mediaBadgeEl.className = "dynamic-media-badge paused";
+            mediaBadgeEl.style.display = "inline-block";
+          }
+        }
+      }
+
+      function setMediaActive(active) {
+        hasMedia = Boolean(active);
+        const playPauseBtn = document.getElementById("btn-play-pause");
+        const closeBtn = document.getElementById("btn-close") || document.querySelector(".btn-close");
+        const prevBtn = document.getElementById("btn-prev");
+        const nextBtn = document.getElementById("btn-next");
+        if (hasMedia) {
+          if (playPauseBtn) {
+            playPauseBtn.classList.remove("disabled");
+            playPauseBtn.removeAttribute("disabled");
+          }
+          if (closeBtn) {
+            closeBtn.classList.remove("disabled");
+            closeBtn.removeAttribute("disabled");
+          }
+          if (prevBtn) {
+            prevBtn.classList.remove("disabled");
+            prevBtn.removeAttribute("disabled");
+          }
+          if (nextBtn) {
+            nextBtn.classList.remove("disabled");
+            nextBtn.removeAttribute("disabled");
+          }
+        } else {
+          if (playPauseBtn) {
+            playPauseBtn.classList.add("disabled");
+            playPauseBtn.setAttribute("disabled", "true");
+          }
+          if (closeBtn) {
+            closeBtn.classList.add("disabled");
+            closeBtn.setAttribute("disabled", "true");
+          }
+          if (prevBtn) {
+            prevBtn.classList.add("disabled");
+            prevBtn.setAttribute("disabled", "true");
+          }
+          if (nextBtn) {
+            nextBtn.classList.add("disabled");
+            nextBtn.setAttribute("disabled", "true");
+          }
+        }
+      }
+
+      async function callApi(endpoint, params = {}) {
+        const token = getToken();
+        const url = new URL("/api/" + endpoint, window.location.origin);
+        if (token) url.searchParams.set("token", token);
+        for (const [k, v] of Object.entries(params)) {
+          url.searchParams.set(k, v);
+        }
+
+        try {
+          const res = await fetch(url.toString());
+          const data = await res.json();
+          if (res.status === 401 || data.code === "INVALID_TOKEN") {
+            modalTokenEl.style.display = "flex";
+            updateStatus(false);
+            return null;
+          }
+          updateStatus(true);
+          return data;
+        } catch (e) {
+          updateStatus(false);
+          return null;
+        }
+      }
+
+      window.Remote = {
+        async sendSlide(action) {
+          if (!hasMedia) return;
+          await callApi("song-slides", { action });
+        },
+        async sendKey(keyCode) {
+          await callApi("keyboard", { key: keyCode });
+        },
+        async playPause() {
+          if (!hasMedia || isTogglingPlay) return;
+          isTogglingPlay = true;
+          try {
+            updatePlayState(isPlaying);
+            await callApi("play-pause");
+          } finally {
+            setTimeout(() => { isTogglingPlay = false; }, 350);
+          }
+        },
+        async volumeUp() {
+          currentVolume = Math.min(100, currentVolume + 5);
+          showToast("🔊 Volume: " + currentVolume + "%");
+          await callApi("volume", { action: "up" });
+        },
+        async volumeDown() {
+          currentVolume = Math.max(0, currentVolume - 5);
+          showToast("🔉 Volume: " + currentVolume + "%");
+          await callApi("volume", { action: "down" });
+        },
+        requestClose() {
+          if (!hasMedia) return;
+          modalConfirmCloseEl.style.display = "flex";
+        },
+        cancelClose() {
+          modalConfirmCloseEl.style.display = "none";
+        },
+        async confirmClose() {
+          modalConfirmCloseEl.style.display = "none";
+          showToast("Apresentação encerrada");
+          await callApi("close-media", { force: "true" });
+        },
+        openSearch() {
+          Remote.clearSearch();
+          searchModal.style.display = "flex";
+          setTimeout(() => searchInput.focus(), 100);
+        },
+        closeSearch() {
+          searchModal.style.display = "none";
+          Remote.clearSearch();
+        },
+        clearSearch() {
+          searchInput.value = "";
+          searchClear.style.display = "none";
+          searchResults.innerHTML = `
+            <div class="search-empty">
+              <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+              <span>Digite o nome da música, número do hino ou trecho da letra para buscar.</span>
+            </div>
+          `;
+          searchInput.focus();
+        },
+        async openSong(id, name, mode = "audio") {
+          const modeLabel = mode === "instrumental" ? "Playback" : mode === "no_audio" ? "Sem Áudio" : "Cantado";
+          showToast("Iniciando (" + modeLabel + "): " + (name || "Música"));
+          Remote.closeSearch();
+          const tag = mode === "instrumental" ? "2" : mode === "no_audio" ? "3" : "1";
+          await callApi("open-song", { id: id, tag: tag, mode: mode });
+        },
+        async saveToken() {
+          const val = tokenInputEl.value.trim().toUpperCase();
+          if (val) {
+            try {
+              const res = await fetch("/api/verify-token?token=" + encodeURIComponent(val));
+              if (res.status === 401) {
+                alert("Token incorreto! Verifique o token no Louvor JA.");
+                tokenInputEl.focus();
+                return;
+              }
+            } catch (err) {}
+            setToken(val);
+            modalTokenEl.style.display = "none";
+            callApi("ping");
+          }
+        },
+        toggleFullscreen() {
+          const isFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+          const docEl = document.documentElement;
+          if (!isFs) {
+            const req = docEl.requestFullscreen || docEl.webkitRequestFullscreen || docEl.mozRequestFullScreen || docEl.msRequestFullscreen;
+            if (req) {
+              const p = req.call(docEl);
+              if (p && p.then) p.then(() => updateFullscreenUI()).catch(() => {});
+            }
+          } else {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if (exit) {
+              const p = exit.call(document);
+              if (p && p.then) p.then(() => updateFullscreenUI()).catch(() => {});
+            }
+          }
+        }
+      };
+
+      // Busca com debounce enquanto digita
+      searchInput.addEventListener("input", function () {
+        const q = searchInput.value.trim();
+        searchClear.style.display = q ? "flex" : "none";
+
+        if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+
+        if (!q) {
+          Remote.clearSearch();
+          return;
+        }
+
+        searchDebounceTimer = setTimeout(async () => {
+          searchResults.innerHTML = `
+            <div class="search-empty">
+              <span style="color: #64b5f6;">Buscando músicas...</span>
+            </div>
+          `;
+
+          const res = await callApi("search-songs", { q });
+          const items = (res && (res.musicas || res.results)) || [];
+
+          if (items.length === 0) {
+            searchResults.innerHTML = `
+              <div class="search-empty">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <span>Nenhuma música encontrada para "${q}".</span>
+              </div>
+            `;
+            return;
+          }
+
+          let html = "";
+          for (const item of items) {
+            const hBadge = item.hymnal_track ? `<span class="hymn-badge">Hino ${item.hymnal_track}</span>` : "";
+            const artist = item.artist ? `<span class="search-item-artist">${item.artist}</span>` : "";
+            const safeName = (item.name || "").replace(/"/g, '&quot;').replace(/'/g, "\\'");
+            const hasPb = Boolean(item.has_instrumental);
+
+            html += `
+              <div class="search-item">
+                <div class="search-item-info" onclick="Remote.openSong(${item.id_music}, '${safeName}', 'audio')">
+                  <div class="search-item-title-row">
+                    ${hBadge}
+                    <span class="search-item-name">${item.name}</span>
+                  </div>
+                  ${artist}
+                </div>
+                <div class="search-item-actions">
+                  <button class="song-action-btn btn-audio" title="Tocar Cantado" onclick="Remote.openSong(${item.id_music}, '${safeName}', 'audio')">
+                    <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                    <span>Cantado</span>
+                  </button>
+                  <button class="song-action-btn btn-pb ${!hasPb ? 'disabled' : ''}" ${!hasPb ? 'disabled' : ''} title="${hasPb ? 'Tocar Playback' : 'Playback indisponível'}" onclick="Remote.openSong(${item.id_music}, '${safeName}', 'instrumental')">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-4.5l6-3.5-6-3.5v7z"/></svg>
+                    <span>Playback</span>
+                  </button>
+                  <button class="song-action-btn btn-no-audio" title="Projetar Sem Áudio" onclick="Remote.openSong(${item.id_music}, '${safeName}', 'no_audio')">
+                    <svg viewBox="0 0 24 24"><path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z"/></svg>
+                    <span>Sem Áudio</span>
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+          searchResults.innerHTML = html;
+        }, 220);
+      });
+
+      // Fechar modais com tecla ESC
+      window.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          if (searchModal.style.display !== "none") {
+            Remote.closeSearch();
+          } else if (modalConfirmCloseEl.style.display !== "none") {
+            Remote.cancelClose();
+          }
+        }
+      });
+
+      // EventSource para receber atualização de estado em tempo real
+      function connectSSE() {
+        const token = getToken();
+        const url = "/api/events" + (token ? "?token=" + encodeURIComponent(token) : "");
+        const evt = new EventSource(url);
+
+        evt.addEventListener("state", function (e) {
+          try {
+            const data = JSON.parse(e.data);
+            updateStatus(true);
+
+            if (data.volume !== undefined) {
+              currentVolume = data.volume;
+            }
+
+            if (data.type === "media") {
+              setMediaActive(true);
+              if (mediaCardEl) mediaCardEl.style.display = "block";
+              if (mediaTitleEl) mediaTitleEl.textContent = data.title || "Música em reprodução";
+              updatePlayState(data.isPaused === true);
+            } else if (data.type === "bible") {
+              setMediaActive(false);
+              if (mediaCardEl) mediaCardEl.style.display = "block";
+              if (mediaTitleEl) mediaTitleEl.textContent = data.bibleReference || "Bíblia Sagrada";
+              if (mediaBadgeEl) mediaBadgeEl.style.display = "none";
+              iconPlay.style.display = "block";
+              iconPause.style.display = "none";
+            } else {
+              setMediaActive(false);
+              if (mediaCardEl) mediaCardEl.style.display = "none";
+              if (mediaTitleEl) mediaTitleEl.textContent = "";
+              if (mediaBadgeEl) mediaBadgeEl.style.display = "none";
+              iconPlay.style.display = "block";
+              iconPause.style.display = "none";
+            }
+          } catch (err) {}
+        });
+
+        evt.onerror = function () {
+          updateStatus(false);
+          evt.close();
+          setTimeout(connectSSE, 3000);
+        };
+      }
+
+      async function checkAuth() {
+        try {
+          const res = await fetch("/api/ping");
+          const data = await res.json();
+          if (data && data.tokenRequired) {
+            const token = getToken();
+            if (!token) {
+              modalTokenEl.style.display = "flex";
+              tokenInputEl.focus();
+            } else {
+              const vRes = await fetch("/api/verify-token?token=" + encodeURIComponent(token));
+              if (vRes.status === 401) {
+                setToken("");
+                modalTokenEl.style.display = "flex";
+                tokenInputEl.value = "";
+                tokenInputEl.focus();
+              }
+            }
+          }
+        } catch (e) {}
+      }
+
+      function updateFullscreenUI() {
+        const isFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+        const iconEnter = document.getElementById("icon-fs-enter");
+        const iconExit = document.getElementById("icon-fs-exit");
+        const btnFs = document.getElementById("btn-fullscreen");
+        const bannerFs = document.getElementById("banner-fullscreen");
+
+        if (iconEnter && iconExit) {
+          iconEnter.style.display = isFs ? "none" : "block";
+          iconExit.style.display = isFs ? "block" : "none";
+        }
+        if (btnFs) {
+          btnFs.classList.toggle("active", isFs);
+          btnFs.setAttribute("title", isFs ? "Sair da Tela Cheia" : "Tela Cheia");
+        }
+        if (bannerFs) {
+          bannerFs.style.display = isFs ? "none" : "flex";
+        }
+      }
+
+      document.addEventListener("fullscreenchange", updateFullscreenUI);
+      document.addEventListener("webkitfullscreenchange", updateFullscreenUI);
+      document.addEventListener("mozfullscreenchange", updateFullscreenUI);
+      document.addEventListener("MSFullscreenChange", updateFullscreenUI);
+
+      window.addEventListener("DOMContentLoaded", () => {
+        updateFullscreenUI();
+      });
+
+      setMediaActive(false);
+      checkAuth();
+      connectSSE();
+      callApi("ping");
+    })();
+  </script>
+</body>
+</html>
