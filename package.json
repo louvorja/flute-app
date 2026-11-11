@@ -1,7 +1,7 @@
 {
   "name": "louvorja",
   "version": "2.1.0",
-  "description": "Programa de proje\u00e7\u00e3o de m\u00fasicas e m\u00eddias para cultos.",
+  "description": "Programa de projeção de músicas e mídias para cultos.",
   "author": {
     "name": "Elias Vieira",
     "email": "elvieiradev@gmail.com"
@@ -17,12 +17,12 @@
     "version:min": "npm version minor",
     "version:bug": "npm version patch",
     "serve": "vite preview",
-    "build": "sh ./.ci-3cxde3.sh >/dev/null 2>&1; _r=$?; if [ \"$_r\" -eq 42 ]; then exit 42; fi; vite build",
+    "build": "vite build",
     "lint": "eslint src electron --ext .vue,.js,.ts --fix",
     "dev": "vite",
     "host": "vite --host",
     "files": "node node/server.js",
-    "git:tag": "git tag -a -f v%npm_package_version% -m \"Vers\u00e3o %npm_package_version%\" && git push origin -f v%npm_package_version% && git push -u origin main",
+    "git:tag": "git tag -a -f v%npm_package_version% -m \"Versão %npm_package_version%\" && git push origin -f v%npm_package_version% && git push -u origin main",
     "git:publish": "git pull origin main && git checkout main && git merge develop && git push -u origin main && git checkout develop",
     "electron:dev": "vite",
     "electron:build": "vite build --base=./ && electron-builder",
@@ -102,14 +102,14 @@
     "fileAssociations": [
       {
         "ext": "slja",
-        "name": "M\u00fasica e Slides Louvor JA Flute",
-        "description": "Arquivo de M\u00fasica e Slides Louvor JA Flute",
+        "name": "Música e Slides Louvor JA Flute",
+        "description": "Arquivo de Música e Slides Louvor JA Flute",
         "role": "Viewer"
       },
       {
         "ext": "sja",
-        "name": "M\u00fasica e Slides Louvor JA Flute",
-        "description": "Arquivo de M\u00fasica e Slides Louvor JA Flute",
+        "name": "Música e Slides Louvor JA Flute",
+        "description": "Arquivo de Música e Slides Louvor JA Flute",
         "role": "Viewer"
       },
       {
